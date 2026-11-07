@@ -1,0 +1,34 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0}
+body{width:100%;height:580px;overflow:hidden;background:#0d3a44;color:#eafcff;font:14px/1.35 -apple-system,"Segoe UI",Roboto,sans-serif}
+#out{position:absolute;left:4%;top:12px;width:92%;height:380px;overflow:hidden;white-space:pre-wrap;font:12px/1.4 monospace}
+#ans{position:absolute;left:4%;top:400px;width:92%;height:70px;overflow:hidden;font:12px/1.4 monospace;color:#ffd56b}
+.b{position:absolute;top:480px;width:45%;height:56px;border:0;border-radius:14px;font-size:17px;font-weight:700;color:#06202a}
+#ask{left:4%;background:#4fdcc9}#tap{left:51%;background:#ffc04a}
+#dot{position:absolute;right:4%;top:12px;width:14px;height:14px;border-radius:7px;background:#ff4d6a;animation:p 1s ease-in-out infinite alternate}
+@keyframes p{to{opacity:.2}}
+</style></head><body>
+<div id="out">probe…</div><div id="dot"></div><div id="ans">Ответ бота появится здесь</div>
+<button class="b" id="ask">Спросить бота</button><button class="b" id="tap">Тап: 0</button>
+<script>
+var $=function(i){return document.getElementById(i)},W=window.TelegramWidget,L=[],n=0,q=0;
+function s(k,f){try{L.push(k+': '+f())}catch(e){L.push(k+': ERR '+e.message)}}
+s('size',function(){return innerWidth+'x'+innerHeight+' dpr '+devicePixelRatio});
+s('UA',function(){return navigator.userAgent.slice(0,40)});
+s('TelegramWidget',function(){return W?Object.keys(W).join(','):'нет (открыто вне Telegram)'});
+s('chatType',function(){return W&&W.chatType});
+s('isForward',function(){return W&&W.isForward});
+s('viewer',function(){return W&&W.viewer?W.viewer.id+' '+(W.viewer.first_name||''):null});
+s('CSS',function(){return ['display:grid','height:1vh','width:min(1px,2px)'].map(function(x){var p=x.split(':');return x+'='+CSS.supports(p[0],p[1])}).join(' ')});
+s('localStorage',function(){var k='probe_opens',v=(+localStorage.getItem(k)||0)+1;localStorage.setItem(k,v);return 'открытий этого сообщения: '+v});
+s('AudioContext',function(){return typeof (window.AudioContext||window.webkitAudioContext)});
+s('rAF / setInterval',function(){return typeof requestAnimationFrame+' / '+typeof setInterval});
+$('out').textContent=L.join('\n');
+$('tap').onclick=function(){n++;this.textContent='Тап: '+n};
+// one tap unlocks one call: request, openLink or openTelegramLink
+$('ask').onclick=function(){
+ if(!W||!W.request){$('ans').textContent='TelegramWidget.request недоступен';return}
+ q++;$('ans').textContent='Спрашиваю…';
+ W.request('ping:'+q).then(function(a){$('ans').textContent='result: '+(a&&a.result)},
+  function(e){$('ans').textContent='ошибка: '+(e&&(e.message||e.code)||e)})};
+</script></body></html>

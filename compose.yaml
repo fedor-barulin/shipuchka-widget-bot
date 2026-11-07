@@ -1,0 +1,15 @@
+services:
+  widget-bot:
+    build: .
+    container_name: widget-bot
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./widgets:/app/widgets:ro
+    mem_limit: 128m
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
